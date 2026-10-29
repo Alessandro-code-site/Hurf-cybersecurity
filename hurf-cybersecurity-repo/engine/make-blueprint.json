@@ -1,0 +1,1043 @@
+{
+  "name": "HURF CyberSecurity · Security Scan",
+  "flow": [
+    {
+      "id": 11,
+      "mapper": {},
+      "module": "scenario-service:StartSubscenario",
+      "version": 2,
+      "metadata": {
+        "designer": {
+          "x": -300,
+          "y": 0,
+          "name": "Start: domain to scan"
+        }
+      },
+      "parameters": {}
+    },
+    {
+      "id": 40,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "mapper": null,
+      "metadata": {
+        "designer": {
+          "x": -100,
+          "y": 0,
+          "name": "Route by mode"
+        }
+      },
+      "routes": [
+        {
+          "flow": [
+            {
+              "id": 1,
+              "mapper": {
+                "url": "https://dns.google/resolve",
+                "method": "get",
+                "timeout": 20,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "queryParameters": [
+                  {
+                    "name": "name",
+                    "value": "{{11.domain}}"
+                  },
+                  {
+                    "name": "type",
+                    "value": "TXT"
+                  }
+                ],
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 0,
+                  "y": 0,
+                  "name": "DNS: SPF and TXT records"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              },
+              "filter": {
+                "name": "Domain scan",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{11.mode}}",
+                      "o": "notexist"
+                    }
+                  ],
+                  [
+                    {
+                      "a": "{{11.mode}}",
+                      "o": "text:equal",
+                      "b": "domain"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "id": 2,
+              "mapper": {
+                "url": "https://dns.google/resolve",
+                "method": "get",
+                "timeout": 20,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "queryParameters": [
+                  {
+                    "name": "name",
+                    "value": "_dmarc.{{11.domain}}"
+                  },
+                  {
+                    "name": "type",
+                    "value": "TXT"
+                  }
+                ],
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 300,
+                  "y": 0,
+                  "name": "DNS: DMARC"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 3,
+              "mapper": {
+                "url": "https://dns.google/resolve",
+                "method": "get",
+                "timeout": 20,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "queryParameters": [
+                  {
+                    "name": "name",
+                    "value": "{{11.domain}}"
+                  },
+                  {
+                    "name": "type",
+                    "value": "MX"
+                  }
+                ],
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 600,
+                  "y": 0,
+                  "name": "DNS: mail servers"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 4,
+              "mapper": {
+                "url": "https://dns.google/resolve",
+                "method": "get",
+                "timeout": 20,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "queryParameters": [
+                  {
+                    "name": "name",
+                    "value": "google._domainkey.{{11.domain}}"
+                  },
+                  {
+                    "name": "type",
+                    "value": "TXT"
+                  }
+                ],
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 900,
+                  "y": 0,
+                  "name": "DNS: DKIM (Google)"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 5,
+              "mapper": {
+                "url": "https://dns.google/resolve",
+                "method": "get",
+                "timeout": 20,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "queryParameters": [
+                  {
+                    "name": "name",
+                    "value": "zoho._domainkey.{{11.domain}}"
+                  },
+                  {
+                    "name": "type",
+                    "value": "TXT"
+                  }
+                ],
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 1200,
+                  "y": 0,
+                  "name": "DNS: DKIM (Zoho)"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 6,
+              "mapper": {
+                "url": "https://dns.google/resolve",
+                "method": "get",
+                "timeout": 20,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "queryParameters": [
+                  {
+                    "name": "name",
+                    "value": "selector1._domainkey.{{11.domain}}"
+                  },
+                  {
+                    "name": "type",
+                    "value": "TXT"
+                  }
+                ],
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 1500,
+                  "y": 0,
+                  "name": "DNS: DKIM (Microsoft)"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 7,
+              "mapper": {
+                "url": "https://dns.google/resolve",
+                "method": "get",
+                "timeout": 20,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "queryParameters": [
+                  {
+                    "name": "name",
+                    "value": "default._domainkey.{{11.domain}}"
+                  },
+                  {
+                    "name": "type",
+                    "value": "TXT"
+                  }
+                ],
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 1800,
+                  "y": 0,
+                  "name": "DNS: DKIM (default)"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 17,
+              "mapper": {
+                "url": "https://dns.google/resolve",
+                "method": "get",
+                "timeout": 20,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "queryParameters": [
+                  {
+                    "name": "name",
+                    "value": "{{11.domain}}"
+                  },
+                  {
+                    "name": "type",
+                    "value": "NS"
+                  }
+                ],
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 1950,
+                  "y": 0,
+                  "name": "DNS: name servers (DNS host)"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 8,
+              "mapper": {
+                "url": "https://{{11.domain}}",
+                "method": "get",
+                "headers": [
+                  {
+                    "name": "User-Agent",
+                    "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 HURF-CyberSecurity-Scan"
+                  }
+                ],
+                "timeout": 25,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "onerror": [
+                {
+                  "id": 10,
+                  "mapper": {
+                    "data": "",
+                    "headers": [],
+                    "statusCode": 0
+                  },
+                  "module": "builtin:Resume",
+                  "version": 1,
+                  "metadata": {}
+                }
+              ],
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 2100,
+                  "y": 0,
+                  "name": "Website: fetch homepage"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 18,
+              "mapper": {
+                "text": "{{8.data}}",
+                "value": "$1\n",
+                "global": true,
+                "pattern": "[\\s\\S]*?(eval\\s*\\(\\s*(?:atob|unescape|decodeURIComponent|escape|String\\.fromCharCode|function\\s*\\(\\s*p\\s*,\\s*a\\s*,\\s*c\\s*,\\s*k)[^<]{0,80}|document\\.write\\s*\\(\\s*(?:unescape|atob|String\\.fromCharCode)[^<]{0,80}|<iframe\\b[^>]{0,400}?(?:width\\s*=\\s*[\"']?0[\"'\\s>]|height\\s*=\\s*[\"']?[01][\"'\\s>]|display\\s*:\\s*none|visibility\\s*:\\s*hidden)[^>]{0,200}>|coinhive|cryptonight|coin-hive|crypto-loot|webminepool|<script\\b[^>]{0,200}?\\bsrc\\s*=\\s*[\"'][^\"'<>]{4,240}[\"']|String\\.fromCharCode\\s*\\(\\s*(?:\\d+\\s*,\\s*){24}|(?:var|let|const)\\s+_0x[0-9a-f]{4,}[^<]{0,40}|\\b(?:viagra|cialis|levitra|casino|online slots?|slot gacor|judi online|togel|payday loans?|replica watches|porn)\\b[^<]{0,60}|<meta\\b[^>]{0,200}http-equiv\\s*=\\s*[\"']?refresh[^>]{0,200}>|(?:window|document|top)\\.location(?:\\.href)?\\s*=\\s*[\"']https?://[^\"'<>]{4,160}[\"'])|[\\s\\S]+$",
+                "multiline": false,
+                "sensitive": false,
+                "singleline": false
+              },
+              "module": "regexp:Replace",
+              "version": 1,
+              "metadata": {
+                "designer": {
+                  "x": 2200,
+                  "y": -200,
+                  "name": "Malware scan: extract scripts and suspicious code"
+                }
+              },
+              "parameters": {}
+            },
+            {
+              "id": 14,
+              "mapper": {
+                "text": "{{8.data}}",
+                "value": "",
+                "global": true,
+                "pattern": "<style[\\s\\S]*?</style>",
+                "multiline": false,
+                "sensitive": false,
+                "singleline": false
+              },
+              "module": "regexp:Replace",
+              "version": 1,
+              "metadata": {
+                "designer": {
+                  "x": 2250,
+                  "y": 0,
+                  "name": "Strip inline styles"
+                }
+              },
+              "parameters": {}
+            },
+            {
+              "id": 15,
+              "mapper": {
+                "text": "{{14.text}}",
+                "value": "$1</script>",
+                "global": true,
+                "pattern": "(<script[^>]*>)[\\s\\S]*?</script>",
+                "multiline": false,
+                "sensitive": false,
+                "singleline": false
+              },
+              "module": "regexp:Replace",
+              "version": 1,
+              "metadata": {
+                "designer": {
+                  "x": 2350,
+                  "y": 0,
+                  "name": "Strip inline script code"
+                }
+              },
+              "parameters": {}
+            },
+            {
+              "id": 16,
+              "mapper": {
+                "text": "{{15.text}}",
+                "value": " ",
+                "global": true,
+                "pattern": "\\s+",
+                "multiline": false,
+                "sensitive": true,
+                "singleline": false
+              },
+              "module": "regexp:Replace",
+              "version": 1,
+              "metadata": {
+                "designer": {
+                  "x": 2450,
+                  "y": 0,
+                  "name": "Collapse whitespace"
+                }
+              },
+              "parameters": {}
+            },
+            {
+              "id": 19,
+              "mapper": {
+                "url": "https://{{11.domain}}/wp-json/wp/v2/users",
+                "method": "get",
+                "headers": [
+                  {
+                    "name": "User-Agent",
+                    "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 HURF-CyberSecurity-Scan"
+                  }
+                ],
+                "timeout": 15,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "onerror": [
+                {
+                  "id": 119,
+                  "mapper": {
+                    "data": "",
+                    "headers": [],
+                    "statusCode": 0
+                  },
+                  "module": "builtin:Resume",
+                  "version": 1,
+                  "metadata": {}
+                }
+              ],
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 2900,
+                  "y": 0,
+                  "name": "Exposure: WordPress user list"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 20,
+              "mapper": {
+                "url": "https://{{11.domain}}/xmlrpc.php",
+                "method": "get",
+                "headers": [
+                  {
+                    "name": "User-Agent",
+                    "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 HURF-CyberSecurity-Scan"
+                  }
+                ],
+                "timeout": 15,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "onerror": [
+                {
+                  "id": 120,
+                  "mapper": {
+                    "data": "",
+                    "headers": [],
+                    "statusCode": 0
+                  },
+                  "module": "builtin:Resume",
+                  "version": 1,
+                  "metadata": {}
+                }
+              ],
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 3000,
+                  "y": 0,
+                  "name": "Exposure: XML-RPC"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 21,
+              "mapper": {
+                "url": "https://{{11.domain}}/.git/HEAD",
+                "method": "get",
+                "headers": [
+                  {
+                    "name": "User-Agent",
+                    "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 HURF-CyberSecurity-Scan"
+                  }
+                ],
+                "timeout": 15,
+                "shareCookies": false,
+                "parseResponse": false,
+                "allowRedirects": true,
+                "stopOnHttpError": false,
+                "requestCompressedContent": true
+              },
+              "module": "http:MakeRequest",
+              "onerror": [
+                {
+                  "id": 121,
+                  "mapper": {
+                    "data": "",
+                    "headers": [],
+                    "statusCode": 0
+                  },
+                  "module": "builtin:Resume",
+                  "version": 1,
+                  "metadata": {}
+                }
+              ],
+              "version": 4,
+              "metadata": {
+                "designer": {
+                  "x": 3100,
+                  "y": 0,
+                  "name": "Exposure: source code folder"
+                }
+              },
+              "parameters": {
+                "authenticationType": "noAuth"
+              }
+            },
+            {
+              "id": 12,
+              "mapper": {
+                "object": {
+                  "mx": "{{3.data}}",
+                  "txt": "{{1.data}}",
+                  "dmarc": "{{2.data}}",
+                  "domain": "{{lower(11.domain)}}",
+                  "web_html": "{{substring(16.text; 0; 30000)}}",
+                  "dkim_zoho": "{{5.data}}",
+                  "scanned_at": "{{now}}",
+                  "web_status": "{{8.statusCode}}",
+                  "dkim_google": "{{4.data}}",
+                  "web_headers": "{{8.headers}}",
+                  "dkim_default": "{{7.data}}",
+                  "dkim_selector1": "{{6.data}}",
+                  "ns": "{{17.data}}",
+                  "web_signals": "{{substring(18.text; 0; 12000)}}",
+                  "wp_users_status": "{{19.statusCode}}",
+                  "wp_users": "{{substring(19.data; 0; 300)}}",
+                  "xmlrpc_status": "{{20.statusCode}}",
+                  "xmlrpc": "{{substring(20.data; 0; 120)}}",
+                  "git_status": "{{21.statusCode}}",
+                  "git": "{{substring(21.data; 0; 60)}}"
+                }
+              },
+              "module": "json:TransformToJSON",
+              "version": 1,
+              "metadata": {
+                "designer": {
+                  "x": 3300,
+                  "y": 0,
+                  "name": "Package results"
+                }
+              },
+              "parameters": {}
+            },
+            {
+              "id": 13,
+              "mapper": {
+                "key": "scan:{{lower(11.domain)}}",
+                "data": {
+                  "url": "{{lower(11.domain)}}",
+                  "notes": "{{12.json}}",
+                  "active": false,
+                  "last_used": "{{now}}",
+                  "source_type": "Security scan"
+                },
+                "overwrite": true
+              },
+              "module": "datastore:AddRecord",
+              "version": 1,
+              "metadata": {
+                "designer": {
+                  "x": 3500,
+                  "y": 0,
+                  "name": "Save scan result for Security Center"
+                }
+              },
+              "parameters": {
+                "datastore": 161148
+              }
+            },
+            {
+              "id": 9,
+              "mapper": {
+                "txt": "saved",
+                "web_status": "{{8.statusCode}}"
+              },
+              "module": "scenario-service:ReturnData",
+              "version": 2,
+              "metadata": {
+                "designer": {
+                  "x": 3700,
+                  "y": 0,
+                  "name": "Done"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 50,
+              "module": "zoho-mail:makeAPICall",
+              "version": 1,
+              "parameters": {
+                "__IMTCONN__": 12024644
+              },
+              "mapper": {
+                "url": "/accounts",
+                "method": "GET",
+                "headers": [],
+                "qs": []
+              },
+              "metadata": {
+                "designer": {
+                  "x": 300,
+                  "y": 400,
+                  "name": "Inbox: mailbox account"
+                }
+              },
+              "filter": {
+                "name": "Inbox scan",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{11.mode}}",
+                      "o": "text:equal",
+                      "b": "inbox"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "id": 51,
+              "module": "zoho-mail:makeAPICall",
+              "version": 1,
+              "parameters": {
+                "__IMTCONN__": 12024644
+              },
+              "mapper": {
+                "url": "/accounts/{{50.body.data[].accountId}}/folders",
+                "method": "GET",
+                "headers": [],
+                "qs": []
+              },
+              "metadata": {
+                "designer": {
+                  "x": 600,
+                  "y": 400,
+                  "name": "Inbox: folders"
+                }
+              }
+            },
+            {
+              "id": 52,
+              "module": "zoho-mail:makeAPICall",
+              "version": 1,
+              "parameters": {
+                "__IMTCONN__": 12024644
+              },
+              "mapper": {
+                "url": "/accounts/{{50.body.data[].accountId}}/messages/view",
+                "method": "GET",
+                "headers": [],
+                "qs": [
+                  {
+                    "key": "folderId",
+                    "value": "{{first(map(51.body.data; \"folderId\"; \"folderType\"; \"Inbox\"))}}"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "{{ifempty(11.ids; 50)}}"
+                  },
+                  {
+                    "key": "sortorder",
+                    "value": "false"
+                  }
+                ]
+              },
+              "metadata": {
+                "designer": {
+                  "x": 900,
+                  "y": 400,
+                  "name": "Inbox: latest emails"
+                }
+              }
+            },
+            {
+              "id": 53,
+              "module": "json:TransformToJSON",
+              "version": 1,
+              "parameters": {},
+              "mapper": {
+                "object": "{{52.body.data}}"
+              },
+              "metadata": {
+                "designer": {
+                  "x": 1200,
+                  "y": 400,
+                  "name": "Inbox: package emails"
+                }
+              }
+            },
+            {
+              "id": 57,
+              "module": "zoho-mail:makeAPICall",
+              "version": 1,
+              "parameters": {
+                "__IMTCONN__": 12024644
+              },
+              "mapper": {
+                "url": "/accounts/{{50.body.data[].accountId}}/messages/view",
+                "method": "GET",
+                "headers": [],
+                "qs": [
+                  {
+                    "key": "folderId",
+                    "value": "{{first(map(51.body.data; \"folderId\"; \"folderType\"; \"Spam\"))}}"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "25"
+                  },
+                  {
+                    "key": "sortorder",
+                    "value": "false"
+                  }
+                ]
+              },
+              "metadata": {
+                "designer": {
+                  "x": 1050,
+                  "y": 600,
+                  "name": "Spam folder: latest caught by Zoho"
+                }
+              },
+              "onerror": [
+                {
+                  "id": 157,
+                  "mapper": {
+                    "body": {
+                      "data": []
+                    },
+                    "headers": [],
+                    "statusCode": 0
+                  },
+                  "module": "builtin:Resume",
+                  "version": 1,
+                  "metadata": {}
+                }
+              ]
+            },
+            {
+              "id": 58,
+              "mapper": {
+                "object": "{{57.body.data}}"
+              },
+              "module": "json:TransformToJSON",
+              "version": 1,
+              "metadata": {
+                "designer": {
+                  "x": 1300,
+                  "y": 600,
+                  "name": "Spam: package emails"
+                }
+              },
+              "parameters": {}
+            },
+            {
+              "id": 54,
+              "module": "json:TransformToJSON",
+              "version": 1,
+              "parameters": {},
+              "mapper": {
+                "object": {
+                  "scanned_at": "{{now}}",
+                  "mailbox": "{{lower(50.body.data[].primaryEmailAddress)}}",
+                  "inboxFolder": "{{first(map(51.body.data; \"folderId\"; \"folderType\"; \"Inbox\"))}}",
+                  "quarantineFolder": "{{ifempty(first(map(51.body.data; \"folderId\"; \"folderName\"; \"HURF Quarantine\")); first(map(51.body.data; \"folderId\"; \"folderType\"; \"Spam\")))}}",
+                  "messages": "{{53.json}}",
+                  "spam": "{{58.json}}",
+                  "spamFolder": "{{first(map(51.body.data; \"folderId\"; \"folderType\"; \"Spam\"))}}",
+                  "limit": "{{ifempty(11.ids; 50)}}"
+                }
+              },
+              "metadata": {
+                "designer": {
+                  "x": 1500,
+                  "y": 400,
+                  "name": "Inbox: package scan"
+                }
+              }
+            },
+            {
+              "id": 55,
+              "module": "datastore:AddRecord",
+              "version": 1,
+              "parameters": {
+                "datastore": 161148
+              },
+              "mapper": {
+                "key": "inbox:{{lower(11.domain)}}",
+                "data": {
+                  "url": "{{lower(11.domain)}}",
+                  "notes": "{{54.json}}",
+                  "active": false,
+                  "last_used": "{{now}}",
+                  "source_type": "Inbox scan"
+                },
+                "overwrite": true
+              },
+              "metadata": {
+                "designer": {
+                  "x": 1800,
+                  "y": 400,
+                  "name": "Inbox: save for Security Center"
+                }
+              }
+            },
+            {
+              "id": 56,
+              "module": "scenario-service:ReturnData",
+              "version": 2,
+              "mapper": {
+                "txt": "inbox saved"
+              },
+              "metadata": {
+                "designer": {
+                  "x": 2100,
+                  "y": 400,
+                  "name": "Inbox: done"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 60,
+              "module": "zoho-mail:makeAPICall",
+              "version": 1,
+              "parameters": {
+                "__IMTCONN__": 12024644
+              },
+              "mapper": {
+                "url": "/accounts",
+                "method": "GET",
+                "headers": [],
+                "qs": []
+              },
+              "metadata": {
+                "designer": {
+                  "x": 300,
+                  "y": 800,
+                  "name": "Move: mailbox account"
+                }
+              },
+              "filter": {
+                "name": "Quarantine or release",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{11.mode}}",
+                      "o": "text:equal",
+                      "b": "quarantine"
+                    }
+                  ],
+                  [
+                    {
+                      "a": "{{11.mode}}",
+                      "o": "text:equal",
+                      "b": "release"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "id": 61,
+              "module": "zoho-mail:makeAPICall",
+              "version": 1,
+              "parameters": {
+                "__IMTCONN__": 12024644
+              },
+              "mapper": {
+                "url": "/accounts/{{60.body.data[].accountId}}/folders",
+                "method": "GET",
+                "headers": [],
+                "qs": []
+              },
+              "metadata": {
+                "designer": {
+                  "x": 600,
+                  "y": 800,
+                  "name": "Move: folders"
+                }
+              }
+            },
+            {
+              "id": 62,
+              "module": "zoho-mail:makeAPICall",
+              "version": 1,
+              "parameters": {
+                "__IMTCONN__": 12024644
+              },
+              "mapper": {
+                "url": "/accounts/{{60.body.data[].accountId}}/updatemessage",
+                "method": "PUT",
+                "headers": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "qs": [],
+                "body": "{\"mode\":\"moveMessage\",\"destfolderId\":\"{{if(11.mode = \"release\"; first(map(61.body.data; \"folderId\"; \"folderType\"; \"Inbox\")); ifempty(first(map(61.body.data; \"folderId\"; \"folderName\"; \"HURF Quarantine\")); first(map(61.body.data; \"folderId\"; \"folderType\"; \"Spam\"))))}}\",\"messageId\":[{{11.ids}}]}"
+              },
+              "metadata": {
+                "designer": {
+                  "x": 900,
+                  "y": 800,
+                  "name": "Move: quarantine or release emails"
+                }
+              }
+            },
+            {
+              "id": 63,
+              "module": "scenario-service:ReturnData",
+              "version": 2,
+              "mapper": {
+                "txt": "moved {{62.statusCode}}"
+              },
+              "metadata": {
+                "designer": {
+                  "x": 1200,
+                  "y": 800,
+                  "name": "Move: done"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "designer": {
+      "orphans": []
+    },
+    "scenario": {
+      "dlq": false,
+      "dataloss": false,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "roundtrips": 1,
+      "sequential": false,
+      "confidential": false,
+      "freshVariables": false,
+      "autoCommitTriggerLast": true
+    }
+  }
+}
